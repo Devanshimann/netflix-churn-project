@@ -1,8 +1,8 @@
-Netflix Customer Churn Prediction
+#Netflix Customer Churn Prediction
 
 This project predicts whether a Netflix user will churn (leave the platform) based on their usage patterns and account details.
 
-📌 Project Overview
+##📌 Project Overview
 
 Performed EDA (Exploratory Data Analysis)
 
@@ -16,7 +16,7 @@ Saved the trained model using joblib
 
 Ready to convert into Streamlit app (future step)
 
-🛠️ Tech Stack
+##🛠️ Tech Stack
 
 Python
 
