@@ -46,6 +46,7 @@ favorite_genre = st.selectbox(
 )
 
 input_df = pd.DataFrame({
+    "customer_id": [0],
     "age": [age],
     "gender": [gender],
     "subscription_type": [subscription_type],
