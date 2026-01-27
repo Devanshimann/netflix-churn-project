@@ -5,7 +5,7 @@ This project predicts whether a Netflix user will churn (leave the platform) bas
 <h3> Project Overview
 </h3>
 <h2>Live demo</h2>
-try the link here :https://netflix-churn-project-4pwpzmpdxipsbp3y9ppiby.streamlit.app/
+try the link here :https://netflix-churn-project-4pwpzmpdxipsbp3y9ppiby.streamlit.app/</br></br?
 Performed EDA (Exploratory Data Analysis)
 
 Visualized churn vs non-churn users
