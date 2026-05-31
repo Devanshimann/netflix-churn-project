@@ -1,0 +1,23 @@
+artifact_path: file:///C:/Users/itsde/OneDrive/Desktop/project-netflix/mlruns/1/models/m-953abdf3d37747d88c5ec3357ccefec7/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.4
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.0
+    skops_trusted_types: null
+mlflow_version: 3.12.0
+model_id: m-953abdf3d37747d88c5ec3357ccefec7
+model_size_bytes: 32945
+model_uuid: m-953abdf3d37747d88c5ec3357ccefec7
+prompts: null
+run_id: 3d45485f0f3442cabee3f5136fd53ede
+utc_time_created: '2026-05-31 15:57:24.637733'
