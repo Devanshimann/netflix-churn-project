@@ -76,7 +76,6 @@ if isinstance(shap_values, list):
     shap_values_churn = shap_values[1]
 else:
     shap_values_churn = shap_values[:, :, 1]
-# Save everything the app needs
 
 joblib.dump(shap_values_churn, "shap_values.pkl")
 joblib.dump(X_test_dense, "X_test_dense.pkl")
