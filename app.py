@@ -5,20 +5,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import shap
 
-# ── LOAD FILES ────────────────────────────────────────────────────────────────
 model        = joblib.load("churn_model.pkl")
 preprocessor = joblib.load("preprocessor.pkl")
-explainer    = joblib.load("shap_explainer.pkl")
+# explainer    = joblib.load("shap_explainer.pkl")
+explainer = shap.TreeExplainer(model)
 feature_names = joblib.load("feature_names.pkl")
 
 df = pd.read_csv("netflix_customer_churn.csv")
 
-# ── UI SETUP ──────────────────────────────────────────────────────────────────
 st.set_page_config(page_title="Netflix Churn Predictor", layout="centered")
 st.title("📺 Netflix Customer Churn Prediction")
 st.write("Enter customer details to predict churn probability")
 
-# ── USER INPUTS ───────────────────────────────────────────────────────────────
 age = st.number_input("Age", min_value=1, max_value=100, value=25)
 
 gender = st.selectbox("Gender", sorted(df["gender"].dropna().unique()))
@@ -54,7 +52,6 @@ favorite_genre = st.selectbox(
 )
 
 input_df = pd.DataFrame({
-    "customer_id":            [0],
     "age":                    [age],
     "gender":                 [gender],
     "subscription_type":      [subscription_type],
@@ -68,8 +65,7 @@ input_df = pd.DataFrame({
     "avg_watch_time_per_day": [avg_watch_time_per_day],
     "favorite_genre":         [favorite_genre]
 })
-
-X_train_schema = df.drop("churned", axis=1)
+X_train_schema = df.drop(["churned", "customer_id"], axis=1)
 input_df = input_df.astype(X_train_schema.dtypes.to_dict())
 
 if st.button("Predict Churn"):
@@ -96,18 +92,25 @@ if st.button("Predict Churn"):
         "SHAP shows which features pushed the prediction toward churn (red) "
         "or away from churn (blue) for this specific customer."
     )
-
-    shap_vals_single = explainer.shap_values(processed_input_dense)
-    # shap_vals_single[1] = SHAP values for class 1 (churn)
-    shap_for_churn = shap_vals_single[1][0]  # shape: (n_features,)
-
+    
    
+    shap_vals_single = explainer.shap_values(
+    processed_input_dense,
+    check_additivity=False
+    )
+    
+    if isinstance(shap_vals_single, list):
+        shap_for_churn = shap_vals_single[1][0]
+    else:
+        shap_for_churn = shap_vals_single[0, :, 1]
+        
     shap_df = pd.DataFrame({
         "Feature": feature_names,
         "SHAP Value": shap_for_churn
     }).sort_values("SHAP Value", key=abs, ascending=False).head(10)
 
     # Bar chart 
+  
     fig, ax = plt.subplots(figsize=(8, 4))
     colors = ["#e53935" if v > 0 else "#1e88e5" for v in shap_df["SHAP Value"]]
     ax.barh(shap_df["Feature"][::-1], shap_df["SHAP Value"][::-1], color=colors[::-1])
@@ -130,11 +133,15 @@ if st.button("Predict Churn"):
         st.markdown(
             f"**Factors reducing churn risk:** {', '.join(top_protect)}"
         )
-\
+
     with st.expander("Show detailed SHAP waterfall chart"):
         shap_explanation = shap.Explanation(
             values=shap_for_churn,
-            base_values=explainer.expected_value[1],
+            base_values=(
+                explainer.expected_value[1]
+                if isinstance(explainer.expected_value, (list, np.ndarray))
+                else explainer.expected_value
+             ),
             data=processed_input_dense[0],
             feature_names=feature_names
         )
