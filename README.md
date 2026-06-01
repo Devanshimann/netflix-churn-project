@@ -1,31 +1,100 @@
-<h1>Netflix Customer Churn Prediction</h1>
+# Netflix Customer Churn Prediction
 
-This project predicts whether a Netflix user will churn (leave the platform) based on their usage patterns and account details.
+## Overview
 
-<h3> Project Overview
-</h3>
-<h2>Live demo</h2>
-try the link here :https://netflix-churn-project-4pwpzmpdxipsbp3y9ppiby.streamlit.app/</br></br?
-Performed EDA (Exploratory Data Analysis)
+This project predicts whether a Netflix customer is likely to churn based on their subscription details, viewing behavior, and account activity. The goal is to help identify at-risk customers and understand the key factors influencing churn through machine learning and explainable AI techniques.
 
-Visualized churn vs non-churn users
+## Live Demo
 
-Built Logistic Regression & Random Forest models
+Try the application here:
 
-Achieved ~94% accuracy with Random Forest
+https://netflix-churn-project-4pwpzmpdxipsbp3y9ppiby.streamlit.app/
 
-Saved the trained model using joblib
+## Features
 
-Ready to convert into Streamlit app (future step)
+* Predict customer churn probability
+* Interactive Streamlit web application
+* Explain predictions using SHAP (SHapley Additive Explanations)
+* Compare Logistic Regression and Random Forest models
+* Visualize model performance with confusion matrix
+* Feature importance analysis using SHAP
 
-<h3> Tech Stack</h3>
+## Dataset Features
 
-Python
+The model uses the following customer attributes:
 
-Pandas, NumPy
+* Age
+* Gender
+* Subscription Type
+* Watch Hours
+* Days Since Last Login
+* Region
+* Device Type
+* Monthly Fee
+* Payment Method
+* Number of Profiles
+* Average Watch Time Per Day
+* Favorite Genre
 
-Scikit-learn
+## Project Workflow
 
-Matplotlib / Seaborn
+1. Data Cleaning and Preprocessing
+2. Exploratory Data Analysis (EDA)
+3. Feature Engineering
+4. Model Training
+5. Model Evaluation
+6. Explainable AI using SHAP
+7. Streamlit Deployment
 
-Joblib
+## Models Used
+
+### Logistic Regression
+
+* Baseline classification model
+* Fast and interpretable
+
+### Random Forest Classifier
+
+* Ensemble learning model
+* Higher predictive performance
+* Selected as the final model
+
+## Model Performance
+
+| Model               | Accuracy  |
+| ------------------- | --------- |
+| Logistic Regression | Evaluated |
+| Random Forest       | ~94%      |
+
+## Explainable AI
+
+The project uses SHAP (SHapley Additive Explanations) to explain individual predictions and identify the most influential factors contributing to customer churn.
+
+## Technologies Used
+
+* Python
+* Pandas
+* NumPy
+* Scikit-learn
+* SHAP
+* Streamlit
+* Matplotlib
+* Seaborn
+* Joblib
+
+## Project Structure
+
+```text
+netflix-churn-project/
+│
+├── app.py
+├── pro1.py
+├── netflix_customer_churn.csv
+├── churn_model.pkl
+├── preprocessor.pkl
+├── feature_names.pkl
+├── shap_summary.png
+├── confusion_matrix.png
+├── requirements.txt
+└── README.md
+```
