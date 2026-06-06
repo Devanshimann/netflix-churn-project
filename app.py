@@ -158,12 +158,12 @@ elif page == "📊 SQL Showcase":
     st.title("📊 SQL Analytics Showcase")
 
     st.markdown("""
-    This section demonstrates SQL skills used for churn analysis,
-    customer segmentation, revenue analysis and business intelligence.
+    This section demonstrates SQL skills used for churn analysis.
     """)
 
     st.divider()
 
+    # ========== 1️⃣ Churn Rate by Subscription Type ==========
     st.subheader("1️⃣ Churn Rate by Subscription Type")
 
     st.code("""
@@ -175,10 +175,19 @@ GROUP BY subscription_type
 ORDER BY churn_rate DESC;
     """, language="sql")
 
-    st.info("Identify which subscription plans have the highest churn rate.")
+    result = (
+        df.groupby("subscription_type")["churned"]
+        .mean()
+        .mul(100)
+        .round(2)
+        .reset_index(name="churn_rate")
+        .sort_values("churn_rate", ascending=False)
+    )
 
+    st.dataframe(result)
     st.divider()
 
+    # ========== 2️⃣ Churn by Age Group ==========
     st.subheader("2️⃣ Churn by Age Group")
 
     st.code("""
@@ -195,10 +204,28 @@ GROUP BY age_group
 ORDER BY churn_rate DESC;
     """, language="sql")
 
-    st.info("Find which age groups are most likely to churn.")
+    age_df = df.copy()
 
+    age_df["age_group"] = pd.cut(
+        age_df["age"],
+        bins=[0, 25, 35, 45, 100],
+        labels=["18-24", "25-34", "35-44", "45+"]
+    )
+
+    result = (
+        age_df.groupby("age_group")["churned"]
+        .mean()
+        .mul(100)
+        .round(2)
+        .reset_index(name="churn_rate")
+    )
+
+    st.dataframe(result)
+    # st.bar_chart(result.set_index("age_group")["churn_rate"])
+    # st.success("Business Insight: Shows which age groups are most likely to churn.")
     st.divider()
 
+    # ========== 3️⃣ Customer Segmentation (Window Functions) ==========
     st.subheader("3️⃣ Customer Segmentation (Window Functions)")
 
     st.code("""
@@ -209,12 +236,28 @@ SELECT
 FROM netflix;
     """, language="sql")
 
-    st.success(
-        "Uses PostgreSQL Window Functions (NTILE) for customer segmentation."
-    )
+    segment_df = df[["customer_id", "watch_hours", "monthly_fee"]].copy()
 
+    segment_df["engagement_score"] = pd.cut(
+    segment_df["watch_hours"],
+    bins=4,
+    labels=[1,2,3,4]
+)
+
+    segment_df["revenue_score"] = pd.cut(
+    segment_df["monthly_fee"],
+    bins=4,
+    labels=[1,2,3,4]
+)
+    st.dataframe(
+        segment_df[
+            ["customer_id", "engagement_score", "revenue_score"]
+        ].head(20)
+    )
+    st.success("Business Insight: Uses segmentation to identify high-value customers.")
     st.divider()
 
+    # ========== 4️⃣ High-Risk Customers ==========
     st.subheader("4️⃣ High-Risk Customers")
 
     st.code("""
@@ -224,12 +267,17 @@ WHERE last_login_days > 30
 AND watch_hours < 50;
     """, language="sql")
 
-    st.info(
-        "Identify customers likely to churn and target retention campaigns."
-    )
+    result = df[
+        (df["last_login_days"] > 30)
+        & (df["watch_hours"] < 50)
+    ]
 
+    st.dataframe(result.head(20))
+    st.metric("High Risk Customers", len(result))
+    st.success("Business Insight: Identify at-risk customers for retention campaigns.")
     st.divider()
 
+    # ========== 5️⃣ Revenue Analysis ==========
     st.subheader("5️⃣ Revenue Analysis")
 
     st.code("""
@@ -242,12 +290,22 @@ GROUP BY subscription_type
 ORDER BY total_revenue DESC;
     """, language="sql")
 
-    st.info(
-        "Measure revenue contribution of each subscription plan."
+    result = (
+        df.groupby("subscription_type")
+        .agg(
+            avg_revenue=("monthly_fee", "mean"),
+            total_revenue=("monthly_fee", "sum")
+        )
+        .round(2)
+        .reset_index()
     )
 
+    st.dataframe(result)
+    st.bar_chart(result.set_index("subscription_type")["total_revenue"])
+    st.success("Business Insight: Identifies the most profitable subscription plan.")
     st.divider()
 
+    # ========== 6️⃣ Most Engaged Customers ==========
     st.subheader("6️⃣ Most Engaged Customers")
 
     st.code("""
@@ -259,12 +317,12 @@ ORDER BY watch_hours DESC
 LIMIT 10;
     """, language="sql")
 
-    st.info(
-        "Identify highly engaged customers for loyalty programs."
-    )
-
+    result = df[["customer_id", "watch_hours"]].sort_values("watch_hours", ascending=False).head(10)
+    st.dataframe(result)
+    st.success("Business Insight: Identify highly engaged customers for loyalty programs.")
     st.divider()
 
+    # ========== 7️⃣ Payment Method Analysis ==========
     st.subheader("7️⃣ Payment Method Analysis")
 
     st.code("""
@@ -277,10 +335,15 @@ GROUP BY payment_method
 ORDER BY churn_rate DESC;
     """, language="sql")
 
-    st.info(
-        "Analyze whether payment methods influence churn."
+    result = (
+        df.groupby("payment_method")
+        .agg(
+            customers=("customer_id", "count"),
+            churn_rate=("churned", lambda x: round(x.mean() * 100, 2))
+        )
+        .reset_index()
     )
 
-    st.divider()
-
-    
+    st.dataframe(result)
+    st.bar_chart(result.set_index("payment_method")["churn_rate"])
+    st.success("Business Insight: Reveals whether payment methods influence churn.")
