@@ -163,7 +163,6 @@ elif page == "📊 SQL Showcase":
 
     st.divider()
 
-    # ========== 1️⃣ Churn Rate by Subscription Type ==========
     st.subheader("1️⃣ Churn Rate by Subscription Type")
 
     st.code("""
@@ -187,7 +186,6 @@ ORDER BY churn_rate DESC;
     st.dataframe(result)
     st.divider()
 
-    # ========== 2️⃣ Churn by Age Group ==========
     st.subheader("2️⃣ Churn by Age Group")
 
     st.code("""
@@ -225,7 +223,7 @@ ORDER BY churn_rate DESC;
     # st.success("Business Insight: Shows which age groups are most likely to churn.")
     st.divider()
 
-    # ========== 3️⃣ Customer Segmentation (Window Functions) ==========
+  
     st.subheader("3️⃣ Customer Segmentation (Window Functions)")
 
     st.code("""
@@ -236,28 +234,24 @@ SELECT
 FROM netflix;
     """, language="sql")
 
-    segment_df = df[["customer_id", "watch_hours", "monthly_fee"]].copy()
-
-    segment_df["engagement_score"] = pd.cut(
-    segment_df["watch_hours"],
-    bins=4,
-    labels=[1,2,3,4]
-)
-
-    segment_df["revenue_score"] = pd.cut(
-    segment_df["monthly_fee"],
-    bins=4,
-    labels=[1,2,3,4]
-)
-    st.dataframe(
-        segment_df[
-            ["customer_id", "engagement_score", "revenue_score"]
-        ].head(20)
+    result = (
+    df[
+        ["customer_id",
+         "watch_hours",
+         "monthly_fee"]
+    ]
+    .sort_values(
+        ["watch_hours", "monthly_fee"],
+        ascending=False
     )
-    st.success("Business Insight: Uses segmentation to identify high-value customers.")
+    .head(20)
+)
+
+    st.dataframe(result)
+  
     st.divider()
 
-    # ========== 4️⃣ High-Risk Customers ==========
+    
     st.subheader("4️⃣ High-Risk Customers")
 
     st.code("""
@@ -301,11 +295,8 @@ ORDER BY total_revenue DESC;
     )
 
     st.dataframe(result)
-    st.bar_chart(result.set_index("subscription_type")["total_revenue"])
-    st.success("Business Insight: Identifies the most profitable subscription plan.")
+    
     st.divider()
-
-    # ========== 6️⃣ Most Engaged Customers ==========
     st.subheader("6️⃣ Most Engaged Customers")
 
     st.code("""
@@ -319,10 +310,9 @@ LIMIT 10;
 
     result = df[["customer_id", "watch_hours"]].sort_values("watch_hours", ascending=False).head(10)
     st.dataframe(result)
-    st.success("Business Insight: Identify highly engaged customers for loyalty programs.")
+  
     st.divider()
 
-    # ========== 7️⃣ Payment Method Analysis ==========
     st.subheader("7️⃣ Payment Method Analysis")
 
     st.code("""
@@ -345,5 +335,3 @@ ORDER BY churn_rate DESC;
     )
 
     st.dataframe(result)
-    st.bar_chart(result.set_index("payment_method")["churn_rate"])
-    st.success("Business Insight: Reveals whether payment methods influence churn.")
